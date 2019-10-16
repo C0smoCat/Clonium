@@ -25,9 +25,6 @@
         //Put your saves to array
         //
         const levels = [
-            '3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-353-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-',
-            '3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-353-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-',
-            '3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-353-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-3-',
             '/0300000320////0330000310/',
             '-000000-0300000320////0330000310-000000-',
             '/0300000310/0032003300/0340000350/--------',
@@ -54,7 +51,12 @@
             '-1-1-1-1-1-1--/001100100010001-1-001110001-1-00110011001000/-1-1-1-1-1-1--',
             '-000000-03000003200001-1-000001-2-2-1-00001-2-2-1-000001-1-0000330000310-000000-',
             '0-0-0-0--30-32-34-00-31-33-35--30-32-34-00-31-33-35--30-32-34-00-31-33-35--0-0-0-0',
-            '000--00003001-1-0310001-1-1-1-00-1-1-2-2-1-1---1-1-2-2-1-1--001-1-1-1-0003201-1-0330000--000'
+            '000--00003001-1-0310001-1-1-1-00-1-1-2-2-1-1---1-1-2-2-1-1--001-1-1-1-0003201-1-0330000--000',
+            '-002-2-00-03001-1-0310002-2-2-2-002-1-2---2-1-2-2-1-2---2-1-2-002-2-2-2-0003201-1-0330-002-2-00-',
+            '-00--00-0300000320/--0000----0000--/0330000310-00--00-',
+            '-00-----01000000-/000-00000000-000/-00000110-----00-',
+            '-00-----01000000-0002-2-2-00002--2-2-00002-2--2-00002-2-2-000-00000110-----00-',
+            '000--0000300--0310000--000000--000000--000/0300000310/'
         ];
         //Player colors
         const cls_ = ["#8300DB", "#D65200", "#00DE07", "#AA9900", "#0000D9", "#E00083", "#D90000"];
@@ -74,6 +76,10 @@
         let animPool = [];
         let animPoolDivs = [];
         let animDiv;
+        let timerCell = undefined;
+        let isTimerOn = false;
+        let timeRemainingMax = 30;
+        let timeRemaining = timeRemainingMax;
 
         function GenMap() {
             document.body.bgColor = '#eee';
@@ -148,9 +154,13 @@
             creativeCells[3][0].style.fontSize = '2.5vmin';
 
             creativeCells[4][0].onclick = function (evt) {
-                Rules();
+                isTimerOn = !isTimerOn;
+                timeRemaining = timeRemainingMax;
+                creativeCells[4][0].innerText = (isTimerOn ? `Timer\n${Math.floor(timeRemaining)}` : 'Timer\nOFF');
+                timerCell.style.color = "rgb(170, 170, 170)";
             };
-            creativeCells[4][0].innerText = 'Rules';
+            creativeCells[4][0].innerText = (isTimerOn ? `Timer\n${Math.floor(timeRemaining)}` : 'Timer\nOFF');
+            timerCell = creativeCells[4][0];
 
             animDiv = document.createElement('animDiv');
             document.body.appendChild(animDiv);
@@ -224,6 +234,7 @@
         }
 
         function UpdateMap() {
+            timeRemaining = timeRemainingMax;
             let f = 0;
             let c = 0;
             for (let y = 0; y < tableH; y++) {
@@ -283,7 +294,9 @@
         }
 
         function ClickDot(rb, x, y) {
-            if (!game) return;
+            if (!game) {
+                return;
+            }
             if (rb) {
                 if (x === 0 && y === tableH - 1 && game) {
                     AnimateInOut();
@@ -467,7 +480,11 @@
                         fill = true;
                     }
                 }
-                if (fill) save += row; else save += '/';
+                if (fill) {
+                    save += row;
+                } else {
+                    save += '/';
+                }
             }
             return save;
         }
@@ -614,195 +631,23 @@
             }
         }
 
-        function AnimateOut() {
-            game = false;
-            let start = Date.now();
-            let toHide = [];
-            for (let y = 0; y < tableH; y++) {
-                for (let x = 0; x < tableW; x++) {
-                    if (!map[y][x].isWall) {
-                        toHide.splice(Rand(0, toHide.length + 1), 0, map[y][x]);
-                    }
-                }
-            }
-            let count = toHide.length;
-            let timer = setInterval(function () {
-                let timePassed = Date.now() - start;
-                if (timePassed >= 5000) {
-                    LoadMap(levels[Rand(0, levels.length)]);
-                    clearInterval(timer);
-                    game = true;
-                    UpdateMap();
-                    return;
-                }
-                while (toHide.length / count > 1 - timePassed / 5000) {
-                    let e = toHide.pop();
-                    e.value = -1;
-                    UpdateMap();
-                }
-
-            }, 20);
-        }
-
-        function AnimateInOut() {
-            game = false;
-            let start = Date.now();
-            let fromColor = [];
-            let fromBorderColor = [];
-            let fromForegroundColor = [];
-            let toColor = [];
-            let toBorderColor = [];
-            let toForegroundColor = [];
-            let swithNumbers = false;
-            let fromCreativeButtonsBackgroundColor = [];
-            let toCreativeButtonsBackgroundColor = [];
-            for (let y = 0; y < tableH; y++) {
-                fromColor[y] = [];
-                fromBorderColor[y] = [];
-                fromForegroundColor[y] = [];
-                for (let x = 0; x < tableW; x++) {
-                    if (map[y][x].isWall) {
-                        fromColor[y][x] = H2R('#eee');
-                        fromForegroundColor[y][x] = H2R('#eee');
-                        fromBorderColor[y][x] = H2R(creativeMode ? '#ddd' : '#eee');
-                    }
-                    else if (map[y][x].player >= 0 && map[y][x].value > 0) {
-                        fromColor[y][x] = H2R(cls[map[y][x].player]);
-                        fromForegroundColor[y][x] = H2R('#eee');
-                        fromBorderColor[y][x] = H2R(cls[map[y][x].player]);
-                    }
-                    else {
-                        fromColor[y][x] = H2R('#ddd');
-                        fromForegroundColor[y][x] = H2R('#aaa');
-                        fromBorderColor[y][x] = H2R('#ddd');
-                    }
-                }
-            }
-            for (let i = 0; i < playerCount; i++) {
-                fromCreativeButtonsBackgroundColor[i] = H2R(cls[i]);
-            }
-            LoadMap(levels[Rand(0, levels.length)]);
-            for (let y = 0; y < tableH; y++) {
-                toColor[y] = [];
-                toBorderColor[y] = [];
-                toForegroundColor[y] = [];
-                for (let x = 0; x < tableW; x++) {
-                    if (map[y][x].isWall) {
-                        toColor[y][x] = H2R('#eee');
-                        toForegroundColor[y][x] = H2R('#eee');
-                        toBorderColor[y][x] = H2R(creativeMode ? '#ddd' : '#eee');
-                    }
-                    else if (map[y][x].player >= 0) {
-                        toColor[y][x] = H2R(cls[map[y][x].player]);
-                        toForegroundColor[y][x] = H2R('#eee');
-                        toBorderColor[y][x] = H2R(cls[map[y][x].player]);
-                    }
-                    else {
-                        toColor[y][x] = H2R('#ddd');
-                        toForegroundColor[y][x] = (map[y][x].value > 0 ? H2R('#aaa') : H2R('#ddd'));
-                        toBorderColor[y][x] = H2R('#ddd');
-                    }
-                }
-            }
-            for (let i = 0; i < playerCount; i++) {
-                toCreativeButtonsBackgroundColor[i] = H2R(cls[i]);
-            }
-            let timer = setInterval(function () {
-                let timePassed = Date.now() - start;
-                if (timePassed >= 2000) {
-                    clearInterval(timer);
-                    game = true;
-                    UpdateMap();
-                    return;
-                }
-                let per = (timePassed / 2000) * 2 - 1;
-                if (per < 0) {
-                    for (let y = 0; y < tableH; y++) {
-                        for (let x = 0; x < tableW; x++) {
-                            tableCells[y][x].bgColor = R2H(InterpolateColor(fromColor[y][x], H2R('#ddd'), 1 + per));
-                            tableCells[y][x].style.color = R2H(InterpolateColor(fromForegroundColor[y][x], H2R('#ddd'), 1 + per));
-                            tableCells[y][x].style.borderColor = R2H(InterpolateColor(fromBorderColor[y][x], H2R('#ddd'), 1 + per));
-                        }
-                    }
-                    for (let i = 0; i < playerCount; i++) {
-                        creativeCells[i + 2][1].bgColor = R2H(InterpolateColor(fromCreativeButtonsBackgroundColor[i], H2R('#ddd'), 1 + per));
-                    }
-                }
-                else {
-                    if (!swithNumbers) {
-                        for (let y = 0; y < tableH; y++) {
-                            for (let x = 0; x < tableW; x++) {
-                                tableCells[y][x].innerText = (map[y][x].value > 0 ? map[y][x].value : '');
-                            }
-                        }
-                        swithNumbers = true;
-                    }
-                    for (let y = 0; y < tableH; y++) {
-                        for (let x = 0; x < tableW; x++) {
-                            if (map[y][x].value !== 0) {
-                                tableCells[y][x].bgColor = R2H(InterpolateColor(H2R('#ddd'), toColor[y][x], per));
-                                tableCells[y][x].style.color = R2H(InterpolateColor(H2R('#ddd'), toForegroundColor[y][x], per));
-                                tableCells[y][x].style.borderColor = R2H(InterpolateColor(H2R('#ddd'), toBorderColor[y][x], per));
-                            }
-                        }
-                    }
-                    for (let i = 0; i < playerCount; i++) {
-                        creativeCells[i + 2][1].bgColor = R2H(InterpolateColor(H2R('#ddd'), toCreativeButtonsBackgroundColor[i], per));
-                    }
-                }
-            }, 20);
-        }
-
-        //Show rules
-        function Rules() {
-            alert('Rules - 1/4\n\nThere are different clips/checkers on the board.');
-            alert('Rules - 2/4\n\nChecker has number of holes (level) and color (marks its owner). Each player has own set of checkers and could increase level of one of them in his turn. When level of checker reaches 3, after next level-up it explodes in four directions');
-            alert('Rules - 3/4\n\nWhen checker explodes on other checkers, levels are summarized and new checkers get color (and owner) of exploded one. ');
-            alert('Rules - 4/4\n\nVictory: capture all checkers.\n\nGood luck!');
-            //Rules copy/paste from https://github.com/pier-bezuhoff/clonium/wiki/Rules-of-Clonium
-        }
-
-        // Interpolates two [r,g,b] colors and returns an [r,g,b] of the result
-        // Taken from the awesome ROT.js roguelike dev library at
-        // https://github.com/ondras/rot.js
-        let InterpolateColor = function (color1, color2, factor) {
-            if (arguments.length < 3) {
-                factor = 0.5;
-            }
-            let result = color1.slice();
-            for (let i = 0; i < 3; i++) {
-                result[i] = Math.round(result[i] + factor * (color2[i] - color1[i]));
-            }
-            return result;
-        };
-
-        // Converts a #ffffff or #fff hex string into an [r,g,b] array
-        let H2R = function (hex) {
-            let result;
-            if (hex.length > 6) {
-                result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-            }
-            else {
-                result = /^#?([a-f\d])([a-f\d])([a-f\d])$/i.exec(hex);
-                result[1] += result[1];
-                result[2] += result[2];
-                result[3] += result[3];
-            }
-            return result ? [
-                parseInt(result[1], 16),
-                parseInt(result[2], 16),
-                parseInt(result[3], 16)
-            ] : null;
-        };
-
-        // Inverse of the above
-        let R2H = function (rgb) {
-            return "#" + ((1 << 24) + (rgb[0] << 16) + (rgb[1] << 8) + rgb[2]).toString(16).slice(1);
-        };
-
-        window.onload = function() {
-            Rules();
+        window.onload = function () {
             GenMap();
+            let timer = setInterval(function () {
+                if (isTimerOn && game) {
+                    if (timeRemaining > 0) {
+                        timeRemaining -= 0.5;
+                        timerCell.innerText = `Timer\n${ Math.floor(timeRemaining)}`;
+                        if (timeRemaining <= 5) {
+                            timerCell.style.color = (timeRemaining % 1 === 0) ? "rgb(170, 170, 170)" : "red";
+                        }
+                    } else {
+                        Bot();
+                        timeRemaining = timeRemainingMax;
+                        timerCell.style.color = "rgb(170, 170, 170)";
+                    }
+                }
+            }, 500);
         }
     </script>
 </head>
