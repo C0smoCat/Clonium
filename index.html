@@ -18,6 +18,21 @@
             text-align: center;
             font-size: 6.25vmin;
         }
+
+        .sel1 {
+            background-image: repeating-linear-gradient(45deg, transparent, transparent 12px, rgba(255, 255, 255, 0.5) 12px, rgba(255, 255, 255, 0.5) 24px);
+            cursor: pointer;
+        }
+
+        .sel2 {
+            background-image: repeating-linear-gradient(45deg, transparent, transparent 15px, rgba(255, 255, 255, 0.5) 15px, rgba(255, 255, 255, 0.5) 30px);
+            cursor: pointer;
+        }
+
+        .sel3 {
+            background-image: repeating-linear-gradient(45deg, transparent, transparent 18px, rgba(255, 255, 255, 0.5) 18px, rgba(255, 255, 255, 0.5) 36px);
+            cursor: pointer;
+        }
     </style>
     <script type="text/javascript">
         'use strict';
@@ -208,7 +223,7 @@
                         };
                     }
 
-                    creativeCells[0][1].style.backgroundImage = 'repeating-linear-gradient(-45deg, transparent, transparent 15px, rgba(255,255,255,.5) 15px, rgba(255,255,255,.5) 30px)';
+                    creativeCells[0][1].className = "dot sel3";
                     creativeCells[0][1].bgColor = '#ddd';
                     creativeCells[0][1].style.color = '#aaaa';
                     creativeCells[1][1].bgColor = '#eee';
@@ -250,21 +265,19 @@
                         if (poll[playerId] === map[y][x].player && game) {
                             switch (map[y][x].value) {
                                 case 1:
-                                    tableCells[y][x].style.backgroundImage = 'repeating-linear-gradient(45deg, transparent, transparent 12px, rgba(255,255,255,0.5) 12px, rgba(255,255,255,0.5) 24px)';
+                                    tableCells[y][x].className = 'dot sel1';
                                     break;
                                 case 2:
-                                    tableCells[y][x].style.backgroundImage = 'repeating-linear-gradient(45deg, transparent, transparent 15px, rgba(255,255,255,0.5) 15px, rgba(255,255,255,0.5) 30px)';
+                                    tableCells[y][x].className = 'dot sel2';
                                     break;
                                 default:
-                                    tableCells[y][x].style.backgroundImage = 'repeating-linear-gradient(45deg, transparent, transparent 18px, rgba(255,255,255,0.5) 18px, rgba(255,255,255,0.5) 36px)';
+                                    tableCells[y][x].className = 'dot sel3';
                                     break;
                             }
-                            tableCells[y][x].style.cursor = 'pointer';
                             f++;
                         }
                         else {
-                            tableCells[y][x].style.backgroundImage = '';
-                            tableCells[y][x].style.cursor = '';
+                            tableCells[y][x].className = 'dot';
                         }
                         tableCells[y][x].innerText = map[y][x].value;
                         tableCells[y][x].style.borderColor = cls[map[y][x].player];
@@ -276,9 +289,8 @@
                         tableCells[y][x].style.borderColor = '#0000';
                         tableCells[y][x].style.color = '#aaa';
                         tableCells[y][x].innerText = (map[y][x].value > 0 ? map[y][x].value : '');
-                        tableCells[y][x].style.cursor = '';
+                        tableCells[y][x].className = 'dot';
                         tableCells[y][x].bgColor = '#ddd';
-                        tableCells[y][x].style.backgroundImage = '';
                     }
                 }
             }
@@ -354,8 +366,9 @@
 
         function CreativeClick(rb, y) {
             if (!rb) {
-                creativeCells[creativeSelect][1].style.backgroundImage = '';
-                creativeCells[y][1].style.backgroundImage = 'repeating-linear-gradient(-45deg, transparent, transparent 15px, rgba(255,255,255,.5) 15px, rgba(255,255,255,.5) 30px)';
+
+                creativeCells[creativeSelect][1].className = 'dot';
+                creativeCells[y][1].className = 'dot sel3';
                 creativeSelect = y;
             }
         }
@@ -634,7 +647,7 @@
         window.onload = function () {
             GenMap();
             let timer = setInterval(function () {
-                if (isTimerOn && game) {
+                if (isTimerOn && game && !creativeMode) {
                     if (timeRemaining > 0) {
                         timeRemaining -= 0.5;
                         timerCell.innerText = `Timer\n${ Math.floor(timeRemaining)}`;
