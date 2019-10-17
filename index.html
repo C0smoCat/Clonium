@@ -71,7 +71,11 @@
             '-00--00-0300000320/--0000----0000--/0330000310-00--00-',
             '-00-----01000000-/000-00000000-000/-00000110-----00-',
             '-00-----01000000-0002-2-2-00002--2-2-00002-2--2-00002-2-2-000-00000110-----00-',
-            '000--0000300--0310000--000000--000000--000/0300000310/'
+            '000--0000300--0310000--000000--000000--000/0300000310/',
+            '--1-321----1-0000001-31000000341-002-2-001-1-002-2-001-30000000351-0000001----1-331---',
+            '---------1-1-1-351-1---30000034--1-02-2-01---1-02-2-01---31000033--1-1-321-1-1----------',
+            '-002-2-00-/00301-1-32002-01---1-02-2-01---1-02-00331-1-3100/-002-2-00-',
+            '-00-----010000---00002-3-000003-3-0000003-3-000003-2-0000---000110-----00-'
         ];
         //Player colors
         const cls_ = ["#8300DB", "#D65200", "#00DE07", "#AA9900", "#0000D9", "#E00083", "#D90000"];
@@ -93,7 +97,7 @@
         let animDiv;
         let timerCell = undefined;
         let isTimerOn = false;
-        let timeRemainingMax = 30;
+        let timeRemainingMax = 20;
         let timeRemaining = timeRemainingMax;
 
         function GenMap() {
@@ -171,10 +175,10 @@
             creativeCells[4][0].onclick = function (evt) {
                 isTimerOn = !isTimerOn;
                 timeRemaining = timeRemainingMax;
-                creativeCells[4][0].innerText = (isTimerOn ? `Timer\n${Math.floor(timeRemaining)}` : 'Timer\nOFF');
+                creativeCells[4][0].innerText = (isTimerOn ? creativeMode ? 'Timer\nPAUSE' : `Timer\n${Math.floor(timeRemaining)}` : 'Timer\nOFF');
                 timerCell.style.color = "rgb(170, 170, 170)";
             };
-            creativeCells[4][0].innerText = (isTimerOn ? `Timer\n${Math.floor(timeRemaining)}` : 'Timer\nOFF');
+            creativeCells[4][0].innerText = (isTimerOn ? creativeMode ? 'Timer\nPAUSE' : `Timer\n${Math.floor(timeRemaining)}` : 'Timer\nOFF');
             timerCell = creativeCells[4][0];
 
             animDiv = document.createElement('animDiv');
@@ -245,6 +249,7 @@
             }
             creativeMode = !creativeMode;
             creativeCells[1][0].style.boxShadow = (creativeMode ? 'inset rgba(0, 0, 0, 0.1) 0px 0px 10px' : '');
+			timerCell.innerText = (isTimerOn ? creativeMode ? 'Timer\nPAUSE' : `Timer\n${Math.floor(timeRemaining)}` : 'Timer\nOFF')
             UpdateMap();
         }
 
@@ -257,8 +262,7 @@
                     if (map[y][x].isWall) {
                         tableCells[y][x].innerText = '';
                         tableCells[y][x].bgColor = '#eee';
-                        tableCells[y][x].style.backgroundImage = '';
-                        tableCells[y][x].style.cursor = '';
+                        tableCells[y][x].className = 'dot';
                         tableCells[y][x].style.borderColor = (creativeMode ? '#ddd' : '#eee');
                     }
                     else if (map[y][x].value > 0 && map[y][x].player >= 0) {
@@ -366,7 +370,6 @@
 
         function CreativeClick(rb, y) {
             if (!rb) {
-
                 creativeCells[creativeSelect][1].className = 'dot';
                 creativeCells[y][1].className = 'dot sel3';
                 creativeSelect = y;
@@ -650,7 +653,7 @@
                 if (isTimerOn && game && !creativeMode) {
                     if (timeRemaining > 0) {
                         timeRemaining -= 0.5;
-                        timerCell.innerText = `Timer\n${ Math.floor(timeRemaining)}`;
+                        timerCell.innerText = `Timer\n${Math.floor(timeRemaining)}`;
                         if (timeRemaining <= 5) {
                             timerCell.style.color = (timeRemaining % 1 === 0) ? "rgb(170, 170, 170)" : "red";
                         }
