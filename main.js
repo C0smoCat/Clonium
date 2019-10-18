@@ -10,16 +10,12 @@ const levels = [
     '-000000-0300000320/000--000000--000/0330000310-000000-',
     '-00--00-0300--0320/--0000----0000--/0330--0310-00--00-',
     '000--0000300000310/-000000--000000-/0320000330000--000',
-    '-000000-0300--0320/0-0000-00-0000-0/0330--0310-000000-',
-    '-000000-0300--0320/0-0--0-00-0--0-0/0330--0310-000000-',
-    '-00--00-0300--0320/--0--0----0--0--/0330--0310-00--00-',
+    '-00--00-0300000320/-00--00--00--00-/0330000310-00--00-',
     '------------------0000----30000----00031----0000------------------',
     '----------0000---0000300--000000--000000--0310000---0000----------',
     '000-----0300-----000000----0000----0000----000000-----0310-----000',
     '-00131300-/002100220010001-1-001110001-1-00110023002000/-00121200-',
     '------------------00320----30000----00031----03300------------------',
-    '-000000-0300--0320000-00000-000--00--000-00000-0000330--0310-000000-',
-    '-000000-0300--03200000-0000--000-00-000--0000-00000330--0310-000000-',
     '-000000-0300-003200000-00000-000-00-000-00000-000003300-0310-000000-',
     '---------000000--03000320--00--00--00--00--03300310--000000---------',
     '---------000000--03000320--000000--000000--03300310--000000---------',
@@ -38,15 +34,19 @@ const levels = [
     '--1-321----1-0000001-31000000341-002-2-001-1-002-2-001-30000000351-0000001----1-331---',
     '---------1-1-1-351-1---30000034--1-02-2-01---1-02-2-01---31000033--1-1-321-1-1----------',
     '-002-2-00-/00301-1-32002-01---1-02-2-01---1-02-00331-1-3100/-002-2-00-',
-    '-00-----010000---00002-3-000003-3-0000003-3-000003-2-0000---000110-----00-',
+    '-00-----030000---00002-3-000003-3-0000003-3-000003-2-0000---000310-----00-',
     '-------------------0310----00000---3003-032---00000----0330----------',
     '-------------------0310----00000---3003-032---00000-----------------',
-    '-------------------0310----0000----3003-0----0000------------------',
+    '--------------------------00000---3003-031---00000-----------------',
     '-----------300-----0000---002-2-031--3302-2-00---0000-----032-----------',
     '---------3-030003---000000--002-2-031--3302-2-00--000000--3-003203----------',
     '---------3-0202003---000000--2302-2-021--2302-2-021--000000--3-0222203----------',
     '-----------2020-----0000---2302-2-021--2302-2-021---0000-----2222-----------',
-    '--000-----1-301----01-1-1-1-1-0-0331-3-1-310-01-1-1-1-1-0---1-321------000-----------'
+    '--000-----1-301----01-1-1-1-1-0-0331-3-1-310-01-1-1-1-1-0---1-321------000-----------',
+    '/030000031000-1-1--00001-3-3-1-00001-3-3-1-0000-1-1--000320000330/',
+    '--------00----000300--0310/-001-1-00---01-1-0-----00-----------',
+    '-1-1-1-1-1-1----------000--0000300000310//---------1-1-1-1-1-1--',
+    '/0100000100/--1-1-1-1-----1-1-1-1---/0110000110/'
 ];
 //Player colors
 const cls_ = ["#8300DB", "#D65200", "#00DE07", "#AA9900", "#0000D9", "#E00083", "#D90000"];
@@ -72,11 +72,11 @@ let timeRemainingMax = 20;
 let timeRemaining = timeRemainingMax;
 
 function GenMap() {
-    document.body.bgColor = '#eee';
     let tableDiv = document.createElement('table');
     tableDiv.style.fontFamily = "Righteous";
     tableDiv.border = 0;
     tableDiv.style.margin = 'auto';
+    tableH = Math.min(tableH, 8);
     tableCells = [];
     map = [];
     tableDiv.style.borderSpacing = '0.5vmin';
@@ -114,38 +114,38 @@ function GenMap() {
         }
     }
 
+    creativeCells[0][0].innerText = 'New game';
     creativeCells[0][0].onclick = function (evt) {
         if (game) {
             LoadMap(levels[Rand(0, levels.length)]);
             UpdateMap();
         }
     };
-    creativeCells[0][0].innerText = 'New game';
+    creativeCells[1][0].innerText = 'Editor';
     creativeCells[1][0].onclick = function (evt) {
         ToggleCreative();
     };
-    creativeCells[1][0].innerText = 'Editor';
+    creativeCells[2][0].innerText = 'Bot';
     creativeCells[2][0].onclick = function (evt) {
         if (game) {
             Bot();
         }
     };
-    creativeCells[2][0].innerText = 'Bot';
+    creativeCells[3][0].innerText = 'Random sequence\n' + (randSequence ? 'ON' : 'OFF');
+    creativeCells[3][0].style.fontSize = '2.5vmin';
     creativeCells[3][0].onclick = function (evt) {
         randSequence = !randSequence;
         creativeCells[3][0].innerText = 'Random sequence\n' + (randSequence ? 'ON' : 'OFF');
         creativeCells[3][0].style.boxShadow = (randSequence ? 'inset rgba(0, 0, 0, 0.1) 0px 0px 10px' : '');
     };
-    creativeCells[3][0].innerText = 'Random sequence\n' + (randSequence ? 'ON' : 'OFF');
-    creativeCells[3][0].style.fontSize = '2.5vmin';
 
+    creativeCells[4][0].innerText = (isTimerOn ? creativeMode ? 'Timer\nPAUSE' : `Timer\n${Math.floor(timeRemaining)}` : 'Timer\nOFF');
     creativeCells[4][0].onclick = function (evt) {
         isTimerOn = !isTimerOn;
         timeRemaining = timeRemainingMax;
         creativeCells[4][0].innerText = (isTimerOn ? creativeMode ? 'Timer\nPAUSE' : `Timer\n${Math.floor(timeRemaining)}` : 'Timer\nOFF');
-        timerCell.style.color = "rgb(170, 170, 170)";
+        timerCell.style.color = "";
     };
-    creativeCells[4][0].innerText = (isTimerOn ? creativeMode ? 'Timer\nPAUSE' : `Timer\n${Math.floor(timeRemaining)}` : 'Timer\nOFF');
     timerCell = creativeCells[4][0];
 
     for (let y = 5; y < tableH - 1; y++) {
@@ -166,21 +166,14 @@ function GenMap() {
 
 function ToggleCreative() {
     if (creativeMode) {
-        for (let y = 0; y < tableH; y++) {
+        for (let y = 0; y < Math.min(tableH, 8); y++) {
             creativeCells[y][1].style.display = "none";
         }
-        console.info('Save your map: \'' + SaveMap() + '\'');
+        console.info(`Save your map: \'${SaveMap()}\'`);
     }
     else {
         if (creativeSelect < 0) {
-            for (let y = 5; y < tableH; y++) {
-                let cell = document.getElementById('row' + y).insertCell();
-                creativeCells[y] = [];
-                creativeCells[y][0] = cell;
-                creativeCells[y][0].className = 'dot';
-                creativeCells[y][0].style.borderColor = '#eee';
-            }
-            for (let y = 0; y < tableH; y++) {
+            for (let y = 0; y < Math.min(tableH, 8); y++) {
                 let cell = document.getElementById('row' + y).insertCell();
                 creativeCells[y][1] = cell;
                 creativeCells[y][1].className = 'dot';
@@ -215,7 +208,7 @@ function ToggleCreative() {
             creativeSelect = 0;
         }
         else {
-            for (let y = 0; y < tableH; y++) {
+            for (let y = 0; y < Math.min(tableH, 8); y++) {
                 creativeCells[y][1].style.display = '';
             }
         }
@@ -228,7 +221,7 @@ function ToggleCreative() {
 
 function UpdateMap() {
     timeRemaining = timeRemainingMax;
-    timerCell.style.color = "rgb(170, 170, 170)";
+    timerCell.style.color = "";
     let f = 0;
     let c = 0;
     for (let y = 0; y < tableH; y++) {
@@ -513,7 +506,7 @@ function LoadMap(save) {
                 map[y][x].value = 0;
                 symbol++;
             }
-            else if (save[symbol] === '-') {
+            else if (save[symbol] === '-' || save[symbol] === undefined) {
                 map[y][x].value = -1;
                 symbol++;
             }
@@ -628,19 +621,19 @@ class Dot {
 
 window.onload = function () {
     GenMap();
-    let timer = setInterval(function () {
+    setInterval(function () {
         if (isTimerOn && game && !creativeMode) {
             if (timeRemaining > 0) {
                 timeRemaining -= 0.5;
                 timerCell.innerText = `Timer\n${Math.floor(timeRemaining)}`;
                 if (timeRemaining <= 5) {
-                    timerCell.style.color = (timeRemaining % 1 === 0) ? "rgb(170, 170, 170)" : "red";
+                    timerCell.style.color = (timeRemaining % 1 === 0) ? "" : "red";
                 }
             } else {
                 Bot();
                 timeRemaining = timeRemainingMax;
-                timerCell.style.color = "rgb(170, 170, 170)";
+                timerCell.style.color = "";
             }
         }
     }, 500);
-}
+};
